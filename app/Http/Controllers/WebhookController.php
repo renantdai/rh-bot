@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\MessageDTO;
 use App\Services\WebhookService;
 use Illuminate\Http\Request;
 
@@ -22,5 +23,16 @@ class WebhookController extends Controller {
     }
 
     public function receiveMessage(Request $request) {
+        $typeMessage = $this->service->validateMessage($request->all());
+
+        if (isset($typeMessage['status'])) {
+            return $this->service->receiveStatusMessage($request->all());
+        }
+
+        if (isset($typeMessage['type'])) {
+            return $this->service->receiveTypeMessage(MessageDTO::makeFromRequest($request));
+        }
+
+        return ['error' => 'requisição falhou'];
     }
 }
