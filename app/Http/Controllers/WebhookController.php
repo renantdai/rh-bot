@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\DTO\MessageDTO;
+use App\Services\MessageReceiveService;
 use App\Services\WebhookService;
+use Exception;
 use Illuminate\Http\Request;
 
 class WebhookController extends Controller {
@@ -24,15 +26,20 @@ class WebhookController extends Controller {
 
     public function receiveMessage(Request $request) {
         $typeMessage = $this->service->validateMessage($request->all());
+        try {
+            if (isset($typeMessage['status'])) {
+                return $this->service->receiveStatusMessage($request->all());
+            }
 
-        if (isset($typeMessage['status'])) {
-            return $this->service->receiveStatusMessage($request->all());
+            if (isset($typeMessage['type'])) {
+                $this->service->receiveTypeMessage(MessageDTO::makeFromRequest($request));
+            }
+
+            $serviceMessage = new MessageReceiveService(MessageDTO::makeFromRequest($request));
+
+            return $serviceMessage->verifyStatus();
+        } catch (Exception $e) {
+            return ['error' => 'requisição falhou', 'msg' => $e->getMessage()];
         }
-
-        if (isset($typeMessage['type'])) {
-            return $this->service->receiveTypeMessage(MessageDTO::makeFromRequest($request));
-        }
-
-        return ['error' => 'requisição falhou'];
     }
 }

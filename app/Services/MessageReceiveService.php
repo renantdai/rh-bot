@@ -2,20 +2,17 @@
 
 namespace App\Services;
 
+use App\DTO\MessageDTO;
+
 class MessageReceiveService {
     public function __construct(
-        public string $type
+        public MessageDTO $dto
     ) {
     }
 
-    public function validateMessage(array $request) {
-        if(isset($request['body']['entry'][0]['changes'][0]['field'])){
-            return MessageReceiveService();
-
+    public function verifyStatus() {
+        if ($this->dto->type == 'text') {
+            return ['msg' => 'sucesso'];
         }
-
-        $body = $request;
     }
-
-
 }
