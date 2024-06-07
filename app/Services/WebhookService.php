@@ -35,7 +35,8 @@ class WebhookService {
     public function receiveStatusMessage(array $request) {
         return '';
     }
+
     public function receiveTypeMessage(MessageDTO $dto) {
-        return $dto;
+        return $this->repository->saveMessage($dto->prepareDataBeforeSave());
     }
 }

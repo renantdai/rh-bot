@@ -96,4 +96,17 @@ class MessageDTO extends AbstractDTO {
 
         return $newFields;
     }
+
+    public function prepareDataBeforeSave() {
+        $data = [];
+        foreach ($this->toArray() as $key) {
+            if (!is_array($key)) {
+                continue;
+            }
+            foreach ($key as $k => $value) {
+                $data[$k] = $value;
+            }
+        }
+        return $data;
+    }
 }
